@@ -1,0 +1,52 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_calendar"
+        android:icon="@drawable/calendar"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_calendar">
+        <menu>
+            <item
+                android:id="@+id/menu_hoje"
+                android:icon="@drawable/calendar"
+                android:orderInCategory="100"
+                android:showAsAction="ifRoom"
+                android:title="Hoje"/>
+            <item
+                android:id="@+id/menu_amanhã"
+                android:icon="@drawable/calendar"
+                android:orderInCategory="100"
+                android:showAsAction="ifRoom"
+                android:title="Amanhã"/>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/menu_sort"
+        android:icon="@drawable/sort"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_sort">
+        <menu>
+            <item
+                android:id="@+id/menu_horariomaisproximo"
+                android:icon="@drawable/sort"
+                android:orderInCategory="100"
+                android:showAsAction="ifRoom"
+                android:title="Horário mais próximo"/>
+            <item
+                android:id="@+id/menu_nome"
+                android:icon="@drawable/sort"
+                android:orderInCategory="100"
+                android:showAsAction="ifRoom"
+                android:title="Nome do filme"/>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/menu_refresh"
+        android:icon="@drawable/refresh"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom|"
+        android:title="@string/menu_refresh"/>
+
+</menu>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Pop Cine</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_refresh">Atualizar filmes</string>
+    <string name="menu_search">Procurar filmes</string>
+    <string name="menu_location">Alterar cidade</string>
+    <string name="menu_sort">Ordenar por</string>
+    <string name="menu_calendar">Alterar dia</string>
+    <string name="title_activity_movie">MovieActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_section3">Elenco</string>
+    <string name="title_section2">Sinopse</string>
+    <string name="title_section1">Cinemas</string>
+    <string name="trailer">Assista ao trailer</string>
+
+</resources>
