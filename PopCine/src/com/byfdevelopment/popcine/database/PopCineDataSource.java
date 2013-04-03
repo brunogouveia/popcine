@@ -13,14 +13,19 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.text.method.MovementMethod;
 import android.util.Log;
 
-import com.byfdevelopment.popcine.database.PopCineContracts.Movies;
-import com.byfdevelopment.popcine.objects.Movie;
+import com.byfdevelopment.popcine.database.PopCineContracts.Movie;
+import com.byfdevelopment.popcine.database.PopCineContracts.ShowTime;
+import com.byfdevelopment.popcine.database.PopCineContracts.Theater;
+import com.byfdevelopment.popcine.database.PopCineContracts.Theater_Movie;
+import com.byfdevelopment.popcine.objects.MovieObj;
 
 public class PopCineDataSource {
 	DataBaseHelper helper;
@@ -34,82 +39,145 @@ public class PopCineDataSource {
 
 	public void open() throws SQLException {
 		database = helper.getWritableDatabase();
+		database.execSQL("PRAGMA foreign_keys=ON;");
 	}
 
 	public void close() {
 		helper.close();
 	}
 
-	public void insertMovie(Movie movie) {
+	public void testMovie() {
 		ContentValues values = new ContentValues();
-		values.put(Movies.NAME, movie.name);
-		values.put(Movies.INFO, movie.info);
-		values.put(Movies.TYPE, movie.type);
-		values.put(Movies.IS_3D, movie.is3D);
+		values.put(Theater.NAME, "Cinépolis");
+		values.put(Theater.CITY, "Sao Paulo");
+		values.put(Theater.INFO, "Av Brasil");
 
-		Log.w("Database", movie.name + " Inserido");
-
-		if (movie.poster != null) {
-			BitmapDrawable s = (BitmapDrawable) movie.poster;
-			Bitmap bit = s.getBitmap();
-			ByteArrayOutputStream arraystream = new ByteArrayOutputStream();
-			bit.compress(Bitmap.CompressFormat.JPEG, 100, arraystream);
-			try {
-				FileOutputStream outputfile = new FileOutputStream(new File(context.getExternalFilesDir(null), movie.name.replaceAll("[:/]", "_") + ".jpg"));
-				outputfile.write(arraystream.toByteArray());
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		try {
+			database.insert(Theater.TABLE_NAME, null, values);
+		} catch (SQLiteConstraintException e) {
+			Log.w("SQLiteConstraintException", "Errinho de leve");
 		}
 
-		String selection = String.format("%s == ? AND %s == ? AND %s == ? AND %s == ?", Movies.NAME, Movies.INFO, Movies.TYPE, Movies.IS_3D);
-		String[] selectionArgs = { movie.name, movie.info, Integer.valueOf(movie.type).toString(), Integer.valueOf((movie.is3D) ? 1 : 0).toString() };
-		Cursor cursor = database.query(Movies.TABLE_NAME, Movies.COLUMNS, selection, selectionArgs, null, null, null);
-
-		if (cursor.getCount() == 0) {
-			database.insert(Movies.TABLE_NAME, null, values);
+		values = new ContentValues();
+		values.put(Theater.NAME, "Cinemark");
+		values.put(Theater.CITY, "Campo Grande");
+		values.put(Theater.INFO, "Av Teste");
+		try {
+			database.insert(Theater.TABLE_NAME, null, values);
+		} catch (SQLiteConstraintException e) {
+			Log.w("SQLiteConstraintException", "Errinho de leve");
 		}
-		cursor.close();
 
+		String[] strings = { "Campo Grande", "Cinépolis" };
+		System.out.println(strings.length);
+		database.delete(Theater.TABLE_NAME, Theater.NAME + " = ? AND " + Theater.CITY + " = ?", strings);
+
+		ContentValues values2 = new ContentValues();
+		values2.put(Movie.NAME, "A onda");
+		values2.put(Movie.INFO, "Filme sobre ondas");
+		values2.put(Movie.SYNOPSIS, "Era uma vez na casa de praia");
+
+		try {
+			if (database.insert(Movie.TABLE_NAME, null, values2) == -1)
+				Log.w("Movie Inser", "Nao inseriu");
+		} catch (SQLiteConstraintException e) {
+			Log.w("SQLiteConstraintException", "Errinho de leve");
+		}
+
+		values2 = new ContentValues();
+		values2.put(Movie.NAME, "A ondassom");
+		values2.put(Movie.INFO, "Filme sobre");
+		values2.put(Movie.SYNOPSIS, "Era uma vez na casa de praia da ondassom");
+
+		try {
+			if (database.insert(Movie.TABLE_NAME, null, values2) == -1)
+				Log.w("Movie Inser", "Nao inseriu");
+		} catch (SQLiteConstraintException e) {
+			Log.w("SQLiteConstraintException", "Errinho de leve");
+		}
+		String[] strings2 = { "A ondas" };
+		database.delete(Movie.TABLE_NAME, Movie.NAME + " = ?", strings2);
+
+		/************************************************/
+		values2 = new ContentValues();
+		values2.put(Theater_Movie.THEATER_FK, 1);
+		values2.put(Theater_Movie.MOVIE_FK, "A onda");
+		values2.put(Theater_Movie.IS_3D, true);
+		values2.put(Theater_Movie.TYPE, 0);
+
+		try {
+			if (database.insert(Theater_Movie.TABLE_NAME, null, values2) == -1)
+				Log.w("Movie Inser", "Nao inseriu");
+		} catch (SQLiteConstraintException e) {
+			Log.w("SQLiteConstraintException", "Errinho de leve");
+		}
+		String[] strings3 = { "Cinemark" };
+
+		/************************************************/
+		values2 = new ContentValues();
+		values2.put(ShowTime.FK, 4);
+		values2.put(ShowTime.TIME, "12:30");
+		values2.put(ShowTime.DATE, "12/11/2013");
+		values2.put(ShowTime.TICKET, "ingresso.com");
+
+		try {
+			if (database.insert(ShowTime.TABLE_NAME, null, values2) == -1)
+				Log.w("Movie Inser", "Nao inseriu");
+		} catch (SQLiteConstraintException e) {
+			Log.w("SQLiteConstraintException", "Errinho de leve");
+		}
+		//database.delete(Theater.TABLE_NAME, Theater.NAME + " = ?", strings3);
+
+		Log.w("Teste", "VAMOS TESTAR!");
+		printAllTheaters();
+		printAllMoves();
+		printAllTheater_Moves();
+		printAllShowtimes();
 	}
 
-	public List<Movie> getMovies() {
-		List<Movie> list = new ArrayList<Movie>();
-
-		// Cursor cursor = database.rawQuery("SELECT * FROM " +
-		// Movies.TABLE_NAME, null);
-		Cursor cursor = database.query(Movies.TABLE_NAME, Movies.COLUMNS, null, null, null, null, Movies.NAME + " ASC");
-
+	public void printAllTheaters() {
+		Cursor cursor = database.rawQuery("SELECT * FROM " + Theater.TABLE_NAME, null);
 		for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-			String name = cursor.getString(cursor.getColumnIndex(Movies.NAME));
-			String info = cursor.getString(cursor.getColumnIndex(Movies.INFO));
-			int type = cursor.getInt(cursor.getColumnIndex(Movies.TYPE));
-			int is3D = cursor.getInt(cursor.getColumnIndex(Movies.IS_3D));
-
-			Movie movie = new Movie(name, info);
-			movie.type = type;
-			movie.is3D = (is3D == 1) ? true : false;
-
-			Log.w("Database", movie.name + " retornado");
-
-			movie.poster = null;
-			try {
-				FileInputStream inputStream = new FileInputStream(new File(context.getExternalFilesDir(null), movie.name.replaceAll("[:/]", "_") + ".jpg"));
-				Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-				BitmapDrawable poster = new BitmapDrawable(context.getResources(), bitmap);
-				movie.poster = poster;
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			list.add(movie);
+			Log.w("Theater Id", String.valueOf(cursor.getInt(cursor.getColumnIndex(Theater.ID))));
+			Log.w("Theater Name", cursor.getString(cursor.getColumnIndex(Theater.NAME)));
+			Log.w("Theater City", cursor.getString(cursor.getColumnIndex(Theater.CITY)));
+			Log.w("Theater Info", cursor.getString(cursor.getColumnIndex(Theater.INFO)));
 		}
 		cursor.close();
-		return list;
+	}
+
+	public void printAllMoves() {
+		Cursor cursor = database.rawQuery("SELECT * FROM " + Movie.TABLE_NAME, null);
+		for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+			Log.w("Movie Id", String.valueOf(cursor.getInt(cursor.getColumnIndex(Movie.ID))));
+			Log.w("Movie Name", cursor.getString(cursor.getColumnIndex(Movie.NAME)));
+			Log.w("Movie info", cursor.getString(cursor.getColumnIndex(Movie.INFO)));
+			Log.w("Movie synop", cursor.getString(cursor.getColumnIndex(Movie.SYNOPSIS)));
+		}
+		cursor.close();
+	}
+
+	public void printAllTheater_Moves() {
+		Cursor cursor = database.rawQuery("SELECT * FROM " + Theater_Movie.TABLE_NAME, null);
+		for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+			Log.w("Theater_Movie Id", String.valueOf(cursor.getInt(cursor.getColumnIndex(Theater_Movie.ID))));
+			Log.w("Theater_Movie TheaterFk", cursor.getString(cursor.getColumnIndex(Theater_Movie.THEATER_FK)));
+			Log.w("Theater_Movie MovieFk", cursor.getString(cursor.getColumnIndex(Theater_Movie.MOVIE_FK)));
+			Log.w("Theater_Movie IS_3d", String.valueOf(cursor.getInt(cursor.getColumnIndex(Theater_Movie.IS_3D))));
+			Log.w("Theater_Movie Type", String.valueOf(cursor.getInt(cursor.getColumnIndex(Theater_Movie.TYPE))));
+		}
+		cursor.close();
+	}
+
+	public void printAllShowtimes() {
+		Cursor cursor = database.rawQuery("SELECT * FROM " + ShowTime.TABLE_NAME, null);
+		for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+			Log.w("Showtimes Id", String.valueOf(cursor.getInt(cursor.getColumnIndex(ShowTime.ID))));
+			Log.w("Showtimes FK", String.valueOf(cursor.getInt(cursor.getColumnIndex(ShowTime.FK))));
+			Log.w("Showtimes time", cursor.getString(cursor.getColumnIndex(ShowTime.TIME)));
+			Log.w("Showtimes date", cursor.getString(cursor.getColumnIndex(ShowTime.DATE)));
+			Log.w("Showtimes ticket", cursor.getString(cursor.getColumnIndex(ShowTime.TICKET)));
+		}
+		cursor.close();
 	}
 }

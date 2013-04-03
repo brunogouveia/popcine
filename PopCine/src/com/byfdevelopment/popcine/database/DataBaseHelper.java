@@ -1,10 +1,13 @@
 package com.byfdevelopment.popcine.database;
 
-import com.byfdevelopment.popcine.database.PopCineContracts.Movies;
-
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.byfdevelopment.popcine.database.PopCineContracts.Movie;
+import com.byfdevelopment.popcine.database.PopCineContracts.ShowTime;
+import com.byfdevelopment.popcine.database.PopCineContracts.Theater;
+import com.byfdevelopment.popcine.database.PopCineContracts.Theater_Movie;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
 
@@ -17,7 +20,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		Movies.createTable(db);
+		db.execSQL("PRAGMA foreign_keys=ON;");
+		Theater.createTable(db);
+		Movie.createTable(db);
+		Theater_Movie.createTable(db);
+		ShowTime.createTable(db);
 	}
 
 	@Override

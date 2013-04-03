@@ -22,7 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.byfdevelopment.popcine.database.PopCineDataSource;
-import com.byfdevelopment.popcine.objects.Movie;
+import com.byfdevelopment.popcine.objects.MovieObj;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.app.SlidingActivity;
 
@@ -37,7 +37,7 @@ public class PopCineActivity extends SlidingActivity implements OnItemClickListe
 	private SimpleAdapter adapter;
 
 	TextView cityname;
-	List<Movie> movies = new ArrayList<Movie>();
+	List<MovieObj> movies = new ArrayList<MovieObj>();
 
 	PopCineDataSource database;
 
@@ -58,22 +58,26 @@ public class PopCineActivity extends SlidingActivity implements OnItemClickListe
 
 		view = (ListView) findViewById(R.id.list);
 
-		String[] de = { "imagem", "name", "show_times", "tipo", "is3d" };
-		int[] para = { R.id.cartaz, R.id.nome_filme, R.id.horarios, R.id.tipo, R.id.is3dmovie };
-		adapter = new SimpleAdapter(this, moviesList, R.layout.itemlist, de, para);
-		adapter.setViewBinder(new MovieViewBinder());
-		view.setAdapter(adapter);
-		view.setOnItemClickListener(this);
-		view.setDivider(null);
-		view.setBackgroundColor(0xcccccccc);
+		/*
+		 * String[] de = { "imagem", "name", "show_times", "tipo", "is3d" };
+		 * int[] para = { R.id.cartaz, R.id.nome_filme, R.id.horarios,
+		 * R.id.tipo, R.id.is3dmovie }; adapter = new SimpleAdapter(this,
+		 * moviesList, R.layout.itemlist, de, para); adapter.setViewBinder(new
+		 * MovieViewBinder()); view.setAdapter(adapter);
+		 */
+		/*
+		 * view.setOnItemClickListener(this); view.setDivider(null);
+		 * view.setBackgroundColor(0xcccccccc);
+		 * 
+		 * ActionBar actionBar = getActionBar();
+		 * actionBar.setCustomView(R.layout.topbar); // load your layout
+		 * actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME |
+		 * ActionBar.DISPLAY_SHOW_CUSTOM);
+		 * 
+		 * cityname = (TextView) findViewById(R.id.cityname);
+		 */
 
-		ActionBar actionBar = getActionBar();
-		actionBar.setCustomView(R.layout.topbar); // load your layout
-		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_CUSTOM);
-
-		cityname = (TextView) findViewById(R.id.cityname);
-
-		startService(new Intent(this, PopCineService.class));
+		// startService(new Intent(this, PopCineService.class));
 
 		database = new PopCineDataSource(this);
 	}
@@ -81,7 +85,8 @@ public class PopCineActivity extends SlidingActivity implements OnItemClickListe
 	@Override
 	protected void onResume() {
 		database.open();
-		updateListView();
+		database.testMovie();
+		// updateListView();
 		super.onResume();
 	}
 
@@ -139,17 +144,7 @@ public class PopCineActivity extends SlidingActivity implements OnItemClickListe
 
 	private List<Map<String, Object>> listMovies() {
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-		List<Movie> movies = database.getMovies();
-		for (Movie movie : movies) {
-			HashMap<String, Object> item = new HashMap<String, Object>();
-			item.put("imagem", movie.poster);
-			item.put("name", movie.name);
-			item.put("show_times", movie.getShowTimesAsString());
-			item.put("tipo", (movie.type == 0) ? dublado : (movie.type == 1) ? legendado : original);
-			item.put("is3d", movie.is3D ? "3d" : "no");
 
-			list.add(item);
-		}
 		return list;
 	}
 

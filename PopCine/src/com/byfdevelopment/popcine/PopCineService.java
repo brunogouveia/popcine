@@ -17,7 +17,7 @@ public class PopCineService extends Service {
 		// ScheduledThreadPoolExecutor pool = new
 		// ScheduledThreadPoolExecutor(1);
 		// pool.scheduleAtFixedRate(new ScratchingTask(), 0,1,TimeUnit.HOURS);
-		new ScratchingTask(getApplicationContext(), null).execute();
+		// new ScratchingTask(getApplicationContext(), null).execute();
 
 		Log.w("PopCineService", "Service exectuado");
 		//return super.onStartCommand(intent, flags, startId);
